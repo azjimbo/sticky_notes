@@ -1,0 +1,80 @@
+<form theme="dark">
+  <label>sticky note add</label>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="text" token="note" searchWhenChanged="false" id="note">
+      <label>Note to display</label>
+      <default></default>
+    </input>
+    <input type="text" token="adminrmks" searchWhenChanged="false" id="adminrmks">
+      <label>Remarks about note</label>
+      <default></default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+        <table>
+          <tr>
+            <td>
+               <p>
+               <font size="+1">
+                These notes will disply via the Sticky Note Panel, where ever you implement that panel.
+               </font>
+              </p>
+              <p>
+                Use these sticky notes to keep others informed of items of immediate concern or administrative tips for resolving issues.  
+              </p>
+              <p>
+                <a href="/app/lookup_editor/lookup_edit?owner=nobody&amp;namespace=searchl&amp;lookup=sticky_notes.csv&amp;type=csv&amp;" target="editlist">Edit the Sticky Note CSV with Lookup Editor</a>
+                <!--NOTE:  Change the "namespace value above to match your App Name" ie: namespace=search to namespace=myapp -->
+              </p>
+            </td>
+          </tr>
+        </table>
+       
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>| gentimes start=-1
+| eval date=(now())
+| eval note="$note$"
+| eval adminrmks="$adminrmks$"
+| join 
+    [| rest /services/authentication/current-context 
+    | search username!=splunk* 
+    | fields + username]
+| append 
+    [| inputlookup sticky_notes.csv append=true]
+| sort - date
+| fillnull value="--" note
+| eval deduper=date+note+adminrmks+username
+| dedup deduper
+| eval dedlen=len(deduper)
+| search dedlen>20 note!="--"
+| sort - date
+| table date note adminrmks username
+| outputlookup sticky_notes.csv
+| eval date=strftime(date, "%Y-%m-%d %H:%M")</query>
+          <done>
+            <unset token="form.note"></unset>
+            <unset token="form.adminrmks"></unset>
+            <unset token="form.author"></unset>
+            <eval token="note">("--")</eval>
+            <eval token="adminrmks">("--")</eval>
+          </done>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,51 @@
+<dashboard>
+  <label>Sticky Note Demo Dashboard</label>
+  <row>
+    <panel>
+      <html><p>  </p>
+        <font size="+2">
+          Use the code for the panel on the right to add a sticky note to your dashboard.
+        </font>
+      </html>
+    </panel>
+
+<!-- if you want to have this on multiple dashboards, you can make a prebuilt panel  -->
+    <panel>
+      <html  id="stickytitlecolor">
+         <style>
+            #stickytitlecolor .panel-body.html {
+                background-color: #FFF685;
+            }
+        </style> 
+        <font size="+2">
+          <b><a href="sticky_note_maintain" target="sticky">Sticky Pad </a></b></font>(&lt;Add/Edit Notes)
+        
+      </html>
+      <table>
+        <search>
+          <query>
+| inputlookup sticky_notes.csv
+| eval nowers=(now())
+| eval expire_when=(now()-259200)
+| eval new=if(date&gt;expire_when,"Y","N")
+| eval from=(username)
+| table date, note from 
+| convert ctime(date)
+| sort -date
+          </query>
+         <refresh>60m</refresh>  <!-- change to suit your needs -->
+       </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color">
+          <colorPalette type="list">[#FFF685]</colorPalette>
+        </format>
+      </table>
+    </panel>
+  </row>
+</dashboard>
