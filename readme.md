@@ -1,4 +1,4 @@
-A set of two dashboards that provide a way to add Yellow Sticky Pad type notes to a dashboard.  The notes are kept in a local csv file.
+A set of two Splunk dashboards that provide a way to add Yellow Sticky Pad type notes to a dashboard.  The notes are kept in a local csv file.
 
 The sticky_note dashboard is a sample.  You can use the code from the Sticky Note Panel to copy to a different dashbaord.
 
